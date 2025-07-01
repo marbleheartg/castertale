@@ -18,4 +18,15 @@ const FRAME = {
   },
 }
 
-export { FRAME, PROJECT_DESCRIPTION, PROJECT_TITLE }
+const CANVAS_WIDTH = 315
+const CANVAS_HEIGHT = 245
+const SCALE = 35
+
+enum Battle {
+  Birds,
+  TGs,
+  Words,
+  X,
+}
+
+export { Battle, CANVAS_HEIGHT, CANVAS_WIDTH, FRAME, PROJECT_DESCRIPTION, PROJECT_TITLE, SCALE }
