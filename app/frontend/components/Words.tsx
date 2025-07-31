@@ -1,10 +1,12 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALE } from "@/lib/constants"
-import { Point, store, updateStore } from "@/lib/store"
+import { Point, store } from "@/lib/store"
 import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
 
 const Words = () => {
   const { heart } = store()
+
+  const unmounted = useRef(false)
 
   const [word, setWord] = useState<Point>({
     x: CANVAS_WIDTH / SCALE - 1,
@@ -18,17 +20,9 @@ const Words = () => {
   const dir = useRef("left")
 
   useEffect(() => {
-    if (!index) return
-
-    if (heart.x === word.x && heart.y >= word.y && heart.y <= word.y + sentences.current[index].length) {
-      updateStore(prev => ({
-        health: prev.health <= 0 ? prev.health : prev.health - 1,
-      }))
-    }
-  }, [word, heart, index])
-
-  useEffect(() => {
     const interval = setInterval(() => {
+      if (unmounted.current) return
+
       if (dir.current === "left") {
         if (word.x <= 0) {
           setIndex(prev => (prev + 1 < sentences.current.length ? prev + 1 : 0))

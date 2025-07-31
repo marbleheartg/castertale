@@ -10,14 +10,6 @@ const Header = () => {
       <div className={clsx("relative aspect-[301/28] w-75 mx-auto")}>
         <Image src={"/images/global/logo.svg"} fill unoptimized alt="logo" />
       </div>
-
-      {/* <Image
-        src={user?.pfpUrl || "/images/global/user.svg"}
-        width={19}
-        height={19}
-        alt="pfp"
-        className={clsx("absolute top-0 right-0", "rounded-full")}
-      /> */}
     </header>
   )
 }

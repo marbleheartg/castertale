@@ -1,28 +1,30 @@
 {
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEwMjEyMTQsInR5cGUiOiJhdXRoIiwia2V5IjoiMHgzMTU3NDk3YjgyZUM5MUEyMzRmMTFFZTQ0NTUzRDJhMzAzZThkNTllIn0",
+    "payload": "eyJkb21haW4iOiJjYXN0ZXJ0YWxlLmZ1biJ9",
+    "signature": "BO8d0Zp1Ap2Epi9Cqe0F2uQ6M/2U+X6BWI3eByePXH8XCxcPCwwW5K8toElXGC0aevUAcOlgstWE1zJAaVLunBw="
+  },
   "frame": {
     "version": "1",
-    "name": "NAME",
-    "iconUrl": "https://HOST.TLD/images/og/manifest/logo.png",
-    "homeUrl": "https://HOST.TLD",
-    "splashImageUrl": "https://HOST.TLD/images/og/splash.png",
-    "splashBackgroundColor": "#ffffff",
-    "subtitle": "SUBTITLE",
-    "description": "DESCRIPTION",
-    "primaryCategory": "PRIMARY_CATEGORY",
-    "tagline": "TAGLINE",
-    "ogTitle": "OG_TITLE",
-    "ogDescription": "OG_DESCRIPTION",
-    "ogImageUrl": "https://HOST.TLD/images/og/manifest/image.png",
-    "heroImageUrl": "https://HOST.TLD/images/og/manifest/image.png",
-    "webhookUrl": "https://HOST.TLD/api/webhook",
-    "canonicalDomain": "HOST.TLD",
-    "screenshotUrls": [
-      "https://HOST.TLD/images/og/manifest/screenshots/1.jpg",
-      "https://HOST.TLD/images/og/manifest/screenshots/2.jpg",
-      "https://HOST.TLD/images/og/manifest/screenshots/3.jpg"
-    ],
-    "requiredChains": ["eip155:10143"],
-    "requiredCapabilities": ["actions.viewProfile", "actions.composeCast", "actions.ready", "actions.close"],
-    "tags": ["tag", "tag", "tag", "tag", "tag"]
+    "name": "CASTERTALE",
+    "iconUrl": "https://castertale.fun/images/og/manifest/icon.png",
+    "homeUrl": "https://castertale.fun",
+    "splashImageUrl": "https://castertale.fun/images/og/splash.png",
+    "splashBackgroundColor": "#000000",
+    "subtitle": "unveil the mystery",
+    "description": "unveil the mystery",
+    "primaryCategory": "games",
+    "tagline": "unveil the mystery",
+    "ogTitle": "unveil the mystery",
+    "ogDescription": "unveil the mystery",
+    "ogImageUrl": "https://castertale.fun/images/og/manifest/og.png",
+    "castShareUrl": "https://castertale.fun",
+    "heroImageUrl": "https://castertale.fun/images/og/manifest/og.png",
+    "webhookUrl": "https://castertale.fun/api/webhook",
+    "canonicalDomain": "castertale.fun",
+    "screenshotUrls": ["https://castertale.fun/images/og/manifest/screenshots/1.jpg"],
+    "requiredChains": [],
+    "requiredCapabilities": ["actions.composeCast", "actions.ready", "actions.close"],
+    "tags": ["undertale", "battle", "tale", "castertale", "game"]
   }
 }

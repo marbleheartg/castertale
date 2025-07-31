@@ -1,5 +1,6 @@
-import { Battle, CANVAS_HEIGHT, CANVAS_WIDTH, SCALE } from "@/lib/constants"
+import { BattleType, CANVAS_HEIGHT, CANVAS_WIDTH, SCALE } from "@/lib/constants"
 import { store, updateStore } from "@/lib/store"
+import sdk from "@farcaster/frame-sdk"
 import clsx from "clsx"
 import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
@@ -77,47 +78,49 @@ function handleTap(e: React.TouchEvent | React.MouseEvent) {
   }
 }
 
-const Event = () => {
+const Battle = () => {
   const { heart, health } = store()
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const gainNodeRef = useRef<GainNode | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
 
   const [time, setTime] = useState(60)
 
-  const [floweySrc, setFloweySrc] = useState("/images/global/flowey.gif")
+  const [win, setWin] = useState(false)
 
-  const [battle, setBattle] = useState<Battle | null>(Battle.Birds)
+  const [battle, setBattle] = useState<BattleType | null>(BattleType.Birds)
 
   const navigate = useNavigate()
 
-  // useEffect(() => {
-  //   if (health <= 0) sdk.actions.close()
-  // }, [health])
+  useEffect(() => {
+    if (health <= 0) sdk.actions.close()
+  }, [health])
 
   useEffect(() => {
     const timers = [
       setTimeout(() => {
-        setBattle(Battle.TGs)
+        setBattle(BattleType.TGs)
       }, 32000),
 
       setTimeout(() => {
-        setBattle(Battle.Words)
+        setBattle(BattleType.Words)
       }, 48500),
 
       setTimeout(() => {
-        setBattle(Battle.X)
+        setBattle(BattleType.X)
       }, 65000),
 
       setTimeout(() => {
-        setFloweySrc("/images/global/defeated-flowey.svg")
+        setWin(true)
         setBattle(null)
       }, 90000),
 
       setTimeout(() => {
         navigate("/result")
-      }, 93000),
+      }, 94000),
     ]
 
     return () => {
@@ -128,27 +131,31 @@ const Event = () => {
   }, [])
 
   useEffect(() => {
-    if (audioRef.current) return
-
     audioRef.current = new Audio("/audio/battle.mp3")
+    audioCtxRef.current = new AudioContext()
+    const source = audioCtxRef.current.createMediaElementSource(audioRef.current)
+    gainNodeRef.current = audioCtxRef.current.createGain()
+    gainNodeRef.current.gain.value = 0.05
+    source.connect(gainNodeRef.current).connect(audioCtxRef.current.destination)
 
-    const audio = audioRef.current
-    if (audio) audio.volume = 0.5
-
-    function handleUserInteraction() {
-      audio?.play().catch(() => {})
-      window.removeEventListener("click", handleUserInteraction)
-      window.removeEventListener("touchstart", handleUserInteraction)
+    const playAudio = () => {
+      audioCtxRef.current?.resume().then(() => {
+        audioRef.current?.play().catch(() => {})
+      })
+      window.removeEventListener("click", playAudio)
+      window.removeEventListener("touchstart", playAudio)
     }
 
-    audio?.play().catch(() => {
-      window.addEventListener("click", handleUserInteraction)
-      window.addEventListener("touchstart", handleUserInteraction)
+    audioRef.current.play().catch(() => {
+      window.addEventListener("click", playAudio)
+      window.addEventListener("touchstart", playAudio)
     })
 
     return () => {
-      window.removeEventListener("click", handleUserInteraction)
-      window.removeEventListener("touchstart", handleUserInteraction)
+      window.removeEventListener("click", playAudio)
+      window.removeEventListener("touchstart", playAudio)
+      audioRef.current?.pause()
+      audioCtxRef.current?.close()
     }
   }, [])
 
@@ -210,13 +217,19 @@ const Event = () => {
 
   return (
     <div>
-      <div className={clsx("fixed top-[8vh] inset-x-0", "flex justify-center", "z-10")}>
+      <div className="fixed top-4 inset-x-0 text-center">move to survive</div>
+
+      <div className={clsx("fixed top-15 inset-x-0", "flex justify-center", "z-10")}>
         <div className="relative aspect-square h-38">
-          <Image src={floweySrc} unoptimized alt="flowey" fill />
+          {win ? (
+            <Image src="/images/global/defeated-flowey.svg" alt="defeated-flowey" fill />
+          ) : (
+            <Image src="/images/global/flowey.gif" unoptimized alt="flowey" fill />
+          )}
         </div>
       </div>
 
-      <div className={clsx("fixed top-[36vh] inset-x-0", "flex justify-center", "z-20")}>
+      <div className={clsx("fixed top-65 inset-x-0", "flex justify-center", "z-20")}>
         <div style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }} className={clsx(`relative`)}>
           <canvas
             ref={canvasRef}
@@ -244,48 +257,35 @@ const Event = () => {
 
           {(() => {
             switch (battle) {
-              case Battle.Birds:
+              case BattleType.Birds:
                 return Array.from({ length: 5 }).map((_, i) => <Bird key={i} />)
-              case Battle.TGs:
+              case BattleType.TGs:
                 return <TGs count={6} />
-              case Battle.Words:
+              case BattleType.Words:
                 return <Words />
-              case Battle.X:
+              case BattleType.X:
                 return <X />
               default:
                 return <></>
             }
           })()}
 
-          {/* {health <= 0 && (
+          {health <= 0 && (
             <div className={clsx(`absolute inset-0 text-white text-4xl`, "flex justify-center items-center")}>
-              <div className="pl-2 pr-1 bg-red-800">GAME OVER</div>
+              <div className="pl-2 pr-1 pb-0.5 bg-red-800">GAME OVER</div>
             </div>
           )}
-
-          {time <= 0 && (
-            <div className={clsx(`absolute inset-0 text-white text-4xl`, "flex justify-center items-center")}>
-              <div className="pl-2 pr-1 bg-green-800">YOU WIN</div>
-            </div>
-          )} */}
         </div>
       </div>
 
-      <div className={clsx("fixed bottom-[10vh] inset-x-0", "flex justify-center gap-5 text-white text-3xl", "z-30")}>
+      <div className={clsx("fixed bottom-16 inset-x-0", "flex justify-center gap-5 text-white text-3xl", "z-30")}>
         <div>{time || "LOL"}/60s</div>
         <div>HP</div>
-        <div className={clsx("w-10 h-10 bg-[#FBFF29]")}></div>
+        <div className={clsx("w-10 h-10 bg-[#715AB9]")}></div>
         <div className={clsx("text-4xl")}>{health}/10</div>
       </div>
-
-      {/* <div className={clsx("flex items-center gap-10", "text-7xl text-white cursor-pointer")}>
-          <div className={clsx("flex items-center gap-3", "border-5 border-[#F67C33] px-2")}>
-            <Image src={"/heart.png"} alt="heart" width={30} height={30} />
-            <div>FIGHT</div>
-          </div>
-        </div> */}
     </div>
   )
 }
 
-export default Event
+export default Battle

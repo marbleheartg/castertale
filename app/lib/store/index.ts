@@ -11,7 +11,6 @@ type StoreData = {
   capabilities?: MiniAppHostCapability[]
   heart: Point
   health: number
-  bgSound: HTMLAudioElement
 
   updateStore: (newState: Partial<StoreData> | ((prev: StoreData) => Partial<StoreData>)) => void
 }
@@ -19,7 +18,6 @@ type StoreData = {
 export const store = create<StoreData>(set => ({
   heart: { x: 4, y: 6 },
   health: 10,
-  bgSound: new Audio("/audio/bg.mp3"),
   updateStore: newState =>
     set(prev => (typeof newState === "function" ? { ...prev, ...newState(prev) } : { ...prev, ...newState })),
 }))

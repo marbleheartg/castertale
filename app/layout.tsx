@@ -1,7 +1,8 @@
 import { Inter } from "next/font/google"
 import { ReactNode } from "react"
 import "./globals.css"
-import { FRAME, PROJECT_DESCRIPTION, PROJECT_TITLE } from "./lib/constants"
+import { MINIAPP, PROJECT_DESCRIPTION, PROJECT_TITLE } from "./lib/constants"
+import ImagesPreload from "./lib/imagesPreload"
 
 const inter = Inter({
   variable: "--inter",
@@ -23,12 +24,15 @@ export default function RootLayout({
         <link rel="preload" href="/audio/laugh.mp3" as="audio" type="audio/mpeg" />
         <link rel="preload" href="/audio/battle.mp3" as="audio" type="audio/mpeg" />
         <link rel="preload" href="/audio/outro.mp3" as="audio" type="audio/mpeg" />
-        <meta name="fc:frame" content={JSON.stringify(FRAME)} />
+        <meta name="fc:miniapp" content={JSON.stringify(MINIAPP)} />
         <title>{PROJECT_TITLE}</title>
         <meta name="description" content={PROJECT_DESCRIPTION} />
         <link rel="icon" type="image/svg+xml" href="/images/global/logo.svg" />
       </head>
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} antialiased`}>
+        {children}
+        <ImagesPreload />
+      </body>
     </html>
   )
 }

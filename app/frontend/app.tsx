@@ -1,5 +1,6 @@
 import clientErrorHandling from "@/lib/clientErrorsReporting"
-import { store, updateStore } from "@/lib/store"
+import Providers from "@/lib/providers"
+import { updateStore } from "@/lib/store"
 import sdk from "@farcaster/frame-sdk"
 import axios from "axios"
 import { useEffect } from "react"
@@ -10,18 +11,20 @@ import Home from "./pages/Home"
 import Result from "./pages/Result"
 
 export default function App() {
-  const { bgSound } = store()
-
   useEffect(() => {
     clientErrorHandling()
     ;(async function () {
-      const { user, client } = await sdk.context
+      try {
+        const { user, client } = await sdk.context
 
-      const capabilities = await sdk.getCapabilities()
+        const capabilities = await sdk.getCapabilities()
 
-      updateStore({ user, client, capabilities })
+        updateStore({ user, client, capabilities })
+      } catch (error) {}
 
-      await sdk.actions.ready({ disableNativeGestures: true })
+      try {
+        await sdk.actions.ready({ disableNativeGestures: true })
+      } catch (error) {}
 
       try {
         const { token: session } = await sdk.quickAuth.getToken()
@@ -31,52 +34,33 @@ export default function App() {
     })()
   }, [])
 
-  useEffect(() => {
-    if (!bgSound) return
-
-    bgSound.volume = 0.5
-
-    function handleUserInteraction() {
-      bgSound.play().catch(() => {})
-      window.removeEventListener("click", handleUserInteraction)
-      window.removeEventListener("touchstart", handleUserInteraction)
-    }
-
-    bgSound.play().catch(() => {
-      window.addEventListener("click", handleUserInteraction)
-      window.addEventListener("touchstart", handleUserInteraction)
-    })
-
-    return () => {
-      window.removeEventListener("click", handleUserInteraction)
-      window.removeEventListener("touchstart", handleUserInteraction)
-      bgSound.pause()
-    }
-  }, [bgSound])
-
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <Header />
-              <Home />
-            </>
-          }
-        />
-        <Route path="/battle" element={<Battle />} />
-        <Route
-          path="/result"
-          element={
-            <>
-              <Header />
-              <Result />
-            </>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <div onDragStart={e => e.preventDefault()}>
+      <Providers>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Header />
+                  <Home />
+                </>
+              }
+            />
+            <Route path="/battle" element={<Battle />} />
+            <Route
+              path="/result"
+              element={
+                <>
+                  <Header />
+                  <Result />
+                </>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </Providers>
+    </div>
   )
 }

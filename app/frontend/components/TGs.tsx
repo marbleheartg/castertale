@@ -1,3 +1,4 @@
+import delay from "@/lib/api/utils/delay"
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALE } from "@/lib/constants"
 import { Point, store, updateStore } from "@/lib/store"
 import sdk from "@farcaster/frame-sdk"
@@ -14,31 +15,31 @@ const TGs = ({ count }: { count: number }) => {
       .map(x => ({ x, y: 0 }))
   }
 
-  function tgAttack() {
+  async function tgAttack() {
     const randomPoints = getRandomUnique(count)
     setPoints(randomPoints)
 
-    setTimeout(() => {
-      setPoints(() =>
-        randomPoints.map(p => ({
-          x: p.x,
-          y: CANVAS_HEIGHT / SCALE - 1,
-        })),
-      )
+    await delay(3000)
 
-      const heart = store.getState().heart
+    setPoints(() =>
+      randomPoints.map(p => ({
+        x: p.x,
+        y: CANVAS_HEIGHT / SCALE - 1,
+      })),
+    )
 
-      for (const point of randomPoints) {
-        if (heart.x === point.x) {
-          if (store.getState().capabilities?.includes("haptics.impactOccurred")) sdk.haptics.impactOccurred("rigid")
-          updateStore(prev => ({
-            health: prev.health <= 0 ? prev.health : prev.health - 1,
-          }))
-        }
+    const heart = store.getState().heart
+
+    for (const point of randomPoints) {
+      if (heart.x === point.x) {
+        if (store.getState().capabilities?.includes("haptics.impactOccurred")) sdk.haptics.impactOccurred("rigid")
+        updateStore(prev => ({
+          health: prev.health <= 0 ? prev.health : prev.health - 1,
+        }))
       }
+    }
 
-      if (store.getState().capabilities?.includes("haptics.impactOccurred")) sdk.haptics.impactOccurred("heavy")
-    }, 3000)
+    if (store.getState().capabilities?.includes("haptics.impactOccurred")) sdk.haptics.impactOccurred("heavy")
   }
 
   useEffect(() => {

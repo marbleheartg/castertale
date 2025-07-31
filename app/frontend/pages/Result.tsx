@@ -3,29 +3,54 @@ import sdk from "@farcaster/frame-sdk"
 import clsx from "clsx"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import { parseAbi, parseEther } from "viem"
+import { base } from "viem/chains"
+import { useConnect, useSwitchChain, useWriteContract } from "wagmi"
 
 export default function Result() {
   const { health } = store()
 
   const [text, setText] = useState("")
+  const [msg, setMsg] = useState("")
+
+  const { connect, connectors } = useConnect()
+  const { status, writeContract } = useWriteContract()
+  const { switchChain } = useSwitchChain()
 
   useEffect(() => {
-    const text = []
-
-    if (health === 10) text.push("made it through with full hp", "think you can match that?")
-    else if (health > 5) text.push("escaped with just a scratch", "your turn!")
-    else if (health > 1) text.push("barely survived the fight", "think you can do better?")
-    else if (health > 0) text.push("finished with 1HP left on the clock", "dare you to try!")
-
-    text.join("\n\n")
-
-    setText(text as unknown as string)
+    if (health === 10) setText(`made it through with full hp 🤯\n\nthink you can match that?`)
+    else if (health > 5) setText(`escaped with ${health}HP 😏\n\nyour turn!`)
+    else if (health > 1) setText(`barely survived the fight with ${health}HP 😤\n\nthink you can do better?`)
+    else if (health >= 0) setText(`finished with 1HP left 😮‍💨\n\ndare you to try!`)
   }, [])
+
+  useEffect(() => {
+    switch (status) {
+      case "idle":
+        setMsg(`🔥 with ${health} HP 🔥`)
+        break
+      case "pending":
+        setMsg(`processing...`)
+        break
+      case "success":
+        setMsg(`🔥 successful mint! 🔥`)
+        break
+      case "error":
+        setMsg(`it's quite little 🥹`)
+        break
+      default:
+        setMsg(`🔥 with ${health} HP 🔥`)
+        break
+    }
+  }, [status, health])
 
   return (
     <main className={clsx("fixed top-55 bottom-0 inset-x-[6vh]", "text-center")}>
       <div className={clsx("outline-white outline-10", "aspect-[9/7]", "flex flex-col justify-around")}>
         <h1 className="text-5xl">YOU WIN</h1>
+
+        <div>{msg}</div>
+
         <div className={clsx("flex flex-col gap-3")}>
           <div
             className={clsx("relative aspect-[128/41] w-32 mx-auto", "cursor-pointer")}
@@ -36,15 +61,26 @@ export default function Result() {
 
           <div
             className={clsx("relative aspect-[128/40] w-32 mx-auto", "cursor-pointer")}
-            onClick={() =>
-              sdk.actions.sendToken({
-                token: "eip155:8453/erc20:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                amount: "1000000",
-                recipientFid: 1021214,
+            onClick={() => {
+              try {
+                connect({ connector: connectors[0] })
+              } catch (error) {}
+
+              try {
+                switchChain({ chainId: base.id })
+              } catch (error) {}
+
+              writeContract({
+                address: "0xB030f18a4f6a307DEd48088ae25d1c96Cb1471B8",
+                abi: parseAbi(["function mint() payable"]),
+                functionName: "mint",
+                args: [],
+                chain: base,
+                value: parseEther("0.00009"),
               })
-            }
+            }}
           >
-            <Image src={"/images/global/donate.svg"} fill unoptimized alt="donate" />
+            <Image src={"/images/global/mint.svg"} fill unoptimized alt="mint" />
           </div>
         </div>
       </div>
