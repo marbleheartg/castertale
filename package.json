@@ -25,14 +25,14 @@
     "react-dom": "^19.2.0",
     "react-router": "^7.9.6",
     "viem": "2.30.5",
-    "wagmi": "^2.19.4",
+    "wagmi": "^2.19.5",
     "zod": "^3.25.76",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
     "@types/node": "^20.19.25",
-    "@types/react": "^19.2.6",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@tailwindcss/postcss": "^4.1.17",
     "tailwindcss": "^4.1.17"
